@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="slides-format" content="viewport">
+    <title>FTD Launch — Pole Intelligence Platform</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg: #080e1a;
+            --color-bg-deep: #030810;
+            --color-surface: #0f1c2e;
+            --color-text: #e8f4fd;
+            --color-text-secondary: #a0bdd4;
+            --color-text-muted: #5a7a96;
+            --color-accent-1: #00d4ff;
+            --color-accent-2: #0088cc;
+            --color-accent-3: #ff7e2e;
+            --color-accent-4: #22c55e;
+            --color-glass-bg: rgba(255,255,255,0.05);
+            --color-glass-border: rgba(0,212,255,0.12);
+            --color-vignette: rgba(0,0,0,0.5);
+            --font-display: 'Instrument Serif', Georgia, serif;
+            --font-body: 'DM Sans', system-ui, sans-serif;
+        }
+    </style>
+
+    <style>
+        :root {
+            --color-bg: #080e1a;
+            --color-text: #e8f4fd;
+            --glow-color-rgb: 0,212,255;
+            --orange-rgb: 255,126,46;
+            --green-rgb: 34,197,94;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { background: var(--color-bg); margin: 0; }
+        body { font-family: 'DM Sans', system-ui, sans-serif; color: var(--color-text); overflow-x: hidden; min-height: 100vh; width: 100%; }
+        .ftd-kajabi-safe { width: 100%; max-width: 100%; margin: 0 auto; background: var(--color-bg); overflow-x: hidden; isolation: isolate; }
+        .deck { width: 100%; max-width: 100%; margin: 0 auto; position: relative; display: flex; flex-direction: column; }
+        .slide { position: relative; width: 100%; min-height: 100vh; background: var(--color-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; padding: clamp(2rem, 4vw, 3rem) 0; opacity: 1; transform: none; pointer-events: auto; }
+        .slide + .slide { border-top: 1px solid rgba(0,212,255,0.08); }
+        .slide.active { opacity: 1; transform: none; pointer-events: auto; }
+        .slide > .content { position: relative; z-index: 2; width: min(1180px, calc(100% - 2rem)); max-width: 1180px; margin-inline: auto; padding: clamp(1.5rem, 4vw, 3.5rem); }
+        .nav-controls { display: none !important; }
+        .nav-btn { width: 36px; height: 36px; border: none; background: rgba(0,212,255,0.08); color: #00d4ff; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.3s; }
+        .nav-btn:hover { background: rgba(0,212,255,0.2); }
+        .slide-dots { display: flex; gap: 7px; }
+        .slide-dots .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(0,212,255,0.2); cursor: pointer; transition: background 0.3s, transform 0.3s; }
+        .slide-dots .dot.active { background: #00d4ff; transform: scale(1.4); }
+        .slide-counter { font-size: 0.75rem; color: #5a7a96; min-width: 36px; text-align: center; font-family: 'DM Sans', sans-serif; }
+
+        .reveal { opacity: 0; transform: translateY(20px); }
+
+        .slide.is-visible .reveal, .slide:first-child .reveal { opacity: 1; transform: translateY(0); }
+        .ftd-kajabi-safe img { max-width: 100%; }
+        .ftd-kajabi-safe .mouse-spotlight { position: fixed; inset: 0; z-index: 99; pointer-events: none; }
+        @media (max-width: 980px) {
+            .slide { min-height: auto; }
+            .slide > .content { width: min(100%, calc(100% - 1rem)); padding: clamp(1.1rem, 3vw, 2rem); }
+        }
+
+        .text-glow { text-shadow: 0 0 20px rgba(0,212,255,0.5), 0 0 40px rgba(0,212,255,0.2); }
+        .stat-glow { text-shadow: 0 0 30px rgba(0,212,255,0.6), 0 0 60px rgba(0,212,255,0.25); }
+        .orange-glow { text-shadow: 0 0 20px rgba(255,126,46,0.6), 0 0 40px rgba(255,126,46,0.25); }
+        .green-glow { text-shadow: 0 0 20px rgba(34,197,94,0.6), 0 0 40px rgba(34,197,94,0.25); }
+
+        @keyframes glow-pulse { 0%, 100% { text-shadow: 0 0 20px rgba(0,212,255,0.5), 0 0 40px rgba(0,212,255,0.2); } 50% { text-shadow: 0 0 35px rgba(0,212,255,0.9), 0 0 70px rgba(0,212,255,0.35); } }
+        .glow-pulse { animation: glow-pulse 3s ease-in-out infinite; }
+
+        @keyframes float-slow { 0% { transform: translate(0,0) scale(1); } 25% { transform: translate(60px,-50px) scale(1.12); } 50% { transform: translate(-40px,40px) scale(0.9); } 75% { transform: translate(50px,20px) scale(1.08); } 100% { transform: translate(0,0) scale(1); } }
+        @keyframes float-drift { 0% { transform: translate(0,0) scale(1) rotate(0deg); } 33% { transform: translate(-50px,-60px) scale(1.15) rotate(3deg); } 66% { transform: translate(40px,30px) scale(0.88) rotate(-2deg); } 100% { transform: translate(0,0) scale(1) rotate(0deg); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+        @keyframes scan-line { 0% { top: -4px; } 100% { top: 100%; } }
+        @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.8; } 100% { transform: scale(2); opacity: 0; } }
+        @keyframes data-flow { 0% { stroke-dashoffset: 200; opacity: 0; } 30% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+        @keyframes orbit { 0% { transform: rotate(0deg) translateX(38px) rotate(0deg); } 100% { transform: rotate(360deg) translateX(38px) rotate(-360deg); } }
+
+        .gradient-mesh { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); animation: float-slow 10s ease-in-out infinite; }
+        .blob:nth-child(2) { animation: float-drift 14s ease-in-out infinite; }
+        .blob:nth-child(3) { animation: float-slow 18s ease-in-out infinite reverse; }
+        .blob:nth-child(4) { animation: float-drift 22s ease-in-out infinite reverse; }
+
+        .slide::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 256px 256px; opacity: 0.025; mix-blend-mode: overlay; }
+        .slide::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse at center, transparent 50%, var(--color-vignette) 100%); }
+
+        .glass-card { background: rgba(255,255,255,0.04); backdrop-filter: blur(12px); border: 1px solid rgba(0,212,255,0.12); border-radius: 16px; transition: transform 0.25s ease, box-shadow 0.25s ease; }
+        .glass-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,212,255,0.15); }
+        .glass-card-orange { background: rgba(255,126,46,0.06); backdrop-filter: blur(12px); border: 1px solid rgba(255,126,46,0.2); border-radius: 16px; transition: transform 0.25s ease, box-shadow 0.25s ease; }
+        .glass-card-orange:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(255,126,46,0.18); }
+        .glass-card-green { background: rgba(34,197,94,0.06); backdrop-filter: blur(12px); border: 1px solid rgba(34,197,94,0.2); border-radius: 16px; transition: transform 0.25s ease, box-shadow 0.25s ease; }
+        .glass-card-green:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(34,197,94,0.18); }
+
+        .step-badge { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #00d4ff, #0088cc); font-weight: 700; font-size: 0.875rem; flex-shrink: 0; }
+        .step-badge-orange { background: linear-gradient(135deg, #ff7e2e, #cc5500); }
+        .step-badge-green { background: linear-gradient(135deg, #22c55e, #15803d); }
+
+        .progress-track { position: relative; display: flex; align-items: stretch; }
+        .progress-line { position: absolute; left: 17px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, #00d4ff, #0088cc, rgba(0,136,204,0)); }
+
+        .bar-fill { height: 8px; border-radius: 4px; width: 0%; transition: width 0.7s ease; }
+
+        .scan-overlay { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: 12px; }
+        .scan-line { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(0,212,255,0.6), transparent); animation: scan-line 3s linear infinite; }
+
+        .pulse-dot { position: relative; display: inline-block; }
+        .pulse-dot::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid #00d4ff; animation: pulse-ring 2s ease-out infinite; }
+
+        .section-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #00d4ff; margin-bottom: 0.75rem; }
+        .section-tag-orange { background: rgba(255,126,46,0.1); border-color: rgba(255,126,46,0.25); color: #ff7e2e; }
+        .section-tag-green { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.25); color: #22c55e; }
+        .section-tag-purple { background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.25); color: #a78bfa; }
+
+        .deco-shape { position: absolute; pointer-events: none; will-change: transform; }
+
+        .pipeline-arrow { color: #00d4ff; font-size: 1.4rem; opacity: 0.6; align-self: center; flex-shrink: 0; }
+
+        .risk-bar { height: 100%; border-radius: 4px; transition: height 1s ease; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+        }
+    </style>
+</head>
+<body>
+<div class="ftd-kajabi-safe">
+
+<div class="mouse-spotlight" style="position:fixed;inset:0;z-index:99;pointer-events:none;"></div>
+
+<div class="deck">
+
+<!-- ═══════════════════════════════════ SLIDE 1: TITLE ═══════════════════════════════════ -->
+<div class="slide slide-1 active" data-slide="1">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:600px;height:600px;top:-150px;right:-120px;background:radial-gradient(circle, #0088cc, transparent 70%);opacity:0.18;"></div>
+        <div class="blob" style="width:400px;height:400px;bottom:-100px;left:-80px;background:radial-gradient(circle, #00d4ff, transparent 70%);opacity:0.12;"></div>
+        <div class="blob" style="width:280px;height:280px;top:40%;left:20%;background:radial-gradient(circle, #ff7e2e, transparent 70%);opacity:0.09;"></div>
+        <div class="blob" style="width:200px;height:200px;bottom:20%;right:25%;background:radial-gradient(circle, #22c55e, transparent 70%);opacity:0.08;"></div>
+    </div>
+    <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1;width:100%;height:100%;"></canvas>
+
+    <!-- Decorative grid lines -->
+    <div class="deco-shape" data-speed="0.02" style="top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(0,212,255,0.025) 60px),repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(0,212,255,0.025) 60px);"></div>
+
+    <div class="content text-center">
+        <div class="reveal" style="margin-bottom:1.5rem;">
+            <div style="display:inline-flex;align-items:center;gap:10px;padding:8px 20px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:30px;">
+                <span style="color:#00d4ff;font-size:0.7rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;font-family:'DM Sans',sans-serif;">FTD Launch</span>
+                <span style="color:rgba(0,212,255,0.4);font-size:0.6rem;">●</span>
+                <span style="color:#5a7a96;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;font-family:'DM Sans',sans-serif;">Educational Platform</span>
+            </div>
+        </div>
+
+        <div class="reveal" style="font-size:clamp(2.4rem,5.5vw,4.8rem);font-family:'Instrument Serif',serif;font-weight:400;line-height:1.1;margin-bottom:0.5rem;background:linear-gradient(135deg,#00d4ff 0%,#e8f4fd 50%,#ff7e2e 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+            Pole Intelligence
+        </div>
+        <div class="reveal" style="font-size:clamp(2.4rem,5.5vw,4.8rem);font-family:'Instrument Serif',serif;font-weight:400;font-style:italic;line-height:1.1;margin-bottom:1.5rem;color:#a0bdd4;">
+            at Scale
+        </div>
+
+        <p class="reveal" style="font-size:clamp(0.85rem,1.4vw,1.1rem);color:#5a7a96;letter-spacing:0.2em;text-transform:uppercase;font-family:'DM Sans',sans-serif;font-weight:500;">
+            Drone · LiDAR · Feature Extraction · JSON → SPIDAcalc
+        </p>
+
+        <div class="reveal" style="margin-top:2.5rem;display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap;">
+            <div style="text-align:center;">
+                <div style="font-size:2rem;font-family:'Instrument Serif',serif;font-weight:700;color:#00d4ff;" class="stat-glow">950K+</div>
+                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.12em;color:#5a7a96;font-family:'DM Sans',sans-serif;">Poles Collected</div>
+            </div>
+            <div style="width:1px;height:40px;background:rgba(0,212,255,0.2);"></div>
+            <div style="text-align:center;">
+                <div style="font-size:2rem;font-family:'Instrument Serif',serif;font-weight:700;color:#ff7e2e;" class="orange-glow">18 mo</div>
+                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.12em;color:#5a7a96;font-family:'DM Sans',sans-serif;">Collection Period</div>
+            </div>
+            <div style="width:1px;height:40px;background:rgba(0,212,255,0.2);"></div>
+            <div style="text-align:center;">
+                <div style="font-size:2rem;font-family:'Instrument Serif',serif;font-weight:700;color:#22c55e;" class="green-glow">GO95 / NESC</div>
+                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.12em;color:#5a7a96;font-family:'DM Sans',sans-serif;">Compliance Standards</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════ SLIDE 2: THE WORKFLOW OVERVIEW ═══════════════════════════════════ -->
+<div class="slide slide-2" data-slide="2">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:400px;height:400px;top:-80px;right:-80px;background:radial-gradient(circle,#0088cc,transparent 70%);opacity:0.1;"></div>
+        <div class="blob" style="width:300px;height:300px;bottom:-60px;left:-60px;background:radial-gradient(circle,#00d4ff,transparent 70%);opacity:0.07;"></div>
+    </div>
+    <div class="content">
+        <div class="reveal section-tag">End-to-End Workflow</div>
+        <h2 class="reveal" style="font-family:'Instrument Serif',serif;font-size:clamp(1.8rem,3.5vw,2.8rem);margin-bottom:0.4rem;line-height:1.2;">From First Flight to Load Compliance</h2>
+        <p class="reveal" style="color:#5a7a96;font-size:0.9rem;margin-bottom:1.8rem;font-family:'DM Sans',sans-serif;">Five interlocking layers of data collection, processing, and analysis — engineered to run at 950K+ pole scale.</p>
+
+        <div class="reveal" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:stretch;">
+            <div class="glass-card" style="padding:1rem 0.75rem;text-align:center;border-top:3px solid #00d4ff;">
+                <div style="font-size:1.6rem;margin-bottom:0.5rem;">🚁</div>
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#00d4ff;font-family:'DM Sans',sans-serif;margin-bottom:0.3rem;">Layer 1</div>
+                <div style="font-size:0.85rem;font-weight:600;font-family:'DM Sans',sans-serif;color:#e8f4fd;">Drone Imagery</div>
+                <div style="font-size:0.72rem;color:#5a7a96;margin-top:0.4rem;font-family:'DM Sans',sans-serif;line-height:1.4;">Pole existence, geo-verification, visual inspection, attachment inventory</div>
+            </div>
+            <div class="glass-card" style="padding:1rem 0.75rem;text-align:center;border-top:3px solid #22c55e;">
+                <div style="font-size:1.6rem;margin-bottom:0.5rem;">🔬</div>
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#22c55e;font-family:'DM Sans',sans-serif;margin-bottom:0.3rem;">Layer 2</div>
+                <div style="font-size:0.85rem;font-weight:600;font-family:'DM Sans',sans-serif;color:#e8f4fd;">Groundline</div>
+                <div style="font-size:0.72rem;color:#5a7a96;margin-top:0.4rem;font-family:'DM Sans',sans-serif;line-height:1.4;">Non-invasive integrity inspection, decay &amp; moisture profiles, health scoring</div>
+            </div>
+            <div class="glass-card" style="padding:1rem 0.75rem;text-align:center;border-top:3px solid #a78bfa;">
+                <div style="font-size:1.6rem;margin-bottom:0.5rem;">📡</div>
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#a78bfa;font-family:'DM Sans',sans-serif;margin-bottom:0.3rem;">Layer 3</div>
+                <div style="font-size:0.85rem;font-weight:600;font-family:'DM Sans',sans-serif;color:#e8f4fd;">LiDAR Capture</div>
+                <div style="font-size:0.72rem;color:#5a7a96;margin-top:0.4rem;font-family:'DM Sans',sans-serif;line-height:1.4;">Mobile → Aerial → Terrestrial point cloud fusion &amp; feature extraction</div>
+            </div>
+            <div class="glass-card" style="padding:1rem 0.75rem;text-align:center;border-top:3px solid #ff7e2e;">
+                <div style="font-size:1.6rem;margin-bottom:0.5rem;">⚙️</div>
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#ff7e2e;font-family:'DM Sans',sans-serif;margin-bottom:0.3rem;">Layer 4</div>
+                <div style="font-size:0.85rem;font-weight:600;font-family:'DM Sans',sans-serif;color:#e8f4fd;">JSON → SPIDA</div>
+                <div style="font-size:0.72rem;color:#5a7a96;margin-top:0.4rem;font-family:'DM Sans',sans-serif;line-height:1.4;">Automated schema compilation, cloud load calc via SPIDAstudio</div>
+            </div>
+            <div class="glass-card" style="padding:1rem 0.75rem;text-align:center;border-top:3px solid #fbbf24;">
+                <div style="font-size:1.6rem;margin-bottom:0.5rem;">🛡️</div>
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#fbbf24;font-family:'DM Sans',sans-serif;margin-bottom:0.3rem;">Layer 5</div>
+                <div style="font-size:0.85rem;font-weight:600;font-family:'DM Sans',sans-serif;color:#e8f4fd;">Risk Matrix</div>
+                <div style="font-size:0.72rem;color:#5a7a96;margin-top:0.4rem;font-family:'DM Sans',sans-serif;line-height:1.4;">Real-time pole health index, weather modeling, remediation tracking</div>
+            </div>
+        </div>
+
+        <div class="reveal" style="margin-top:1.2rem;padding:0.75rem 1rem;background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.12);border-radius:10px;display:flex;align-items:center;gap:0.75rem;">
+            <span style="color:#00d4ff;font-size:1rem;">💡</span>
+            <span style="font-size:0.78rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;"><strong style="color:#e8f4fd;">The core idea:</strong> each layer enriches the pole record — drone data creates the foundation, groundline adds structural health, LiDAR adds precision geometry, SPIDA adds compliance status, and the risk matrix synthesizes everything into an actionable pole health score.</span>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════ SLIDE 3: DRONE IMAGERY ═══════════════════════════════════ -->
+<div class="slide slide-3" data-slide="3">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:500px;height:500px;top:-120px;right:-100px;background:radial-gradient(circle,#0088cc,transparent 70%);opacity:0.12;"></div>
+        <div class="blob" style="width:280px;height:280px;bottom:-60px;left:10%;background:radial-gradient(circle,#00d4ff,transparent 70%);opacity:0.09;"></div>
+    </div>
+    <canvas class="particle-canvas-ambient" style="position:absolute;inset:0;z-index:1;width:100%;height:100%;"></canvas>
+
+    <div class="content">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:center;">
+            <div>
+                <div class="reveal section-tag">Layer 1 — Drone Imagery</div>
+                <h2 class="reveal" style="font-family:'Instrument Serif',serif;font-size:clamp(1.8rem,3.2vw,2.6rem);line-height:1.2;margin-bottom:1rem;">The Foundational<br><em>Data Layer</em></h2>
+                <p class="reveal" style="color:#a0bdd4;font-size:0.85rem;margin-bottom:1.2rem;font-family:'DM Sans',sans-serif;line-height:1.6;">Every pole record begins here. Drone imagery provides the ground truth layer that validates existence, corrects GIS coordinates, and catalogs every visible component before any other data is collected.</p>
+
+                <div class="reveal" style="display:flex;flex-direction:column;gap:0.6rem;">
+                    <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.65rem 0.85rem;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.1);border-radius:10px;">
+                        <span style="color:#00d4ff;font-size:0.9rem;flex-shrink:0;margin-top:1px;">✦</span>
+                        <span style="font-size:0.8rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;line-height:1.5;"><strong style="color:#e8f4fd;">Geo-verification</strong> — True up pole coordinates, correcting legacy GIS errors that can be off by meters</span>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.65rem 0.85rem;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.1);border-radius:10px;">
+                        <span style="color:#00d4ff;font-size:0.9rem;flex-shrink:0;margin-top:1px;">✦</span>
+                        <span style="font-size:0.8rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;line-height:1.5;"><strong style="color:#e8f4fd;">Joint-use attachment inventory</strong> — Cable sizes, messenger wires, cross arms, transformers, street lights</span>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.65rem 0.85rem;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.1);border-radius:10px;">
+                        <span style="color:#00d4ff;font-size:0.9rem;flex-shrink:0;margin-top:1px;">✦</span>
+                        <span style="font-size:0.8rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;line-height:1.5;"><strong style="color:#e8f4fd;">Down guys &amp; anchors</strong> — Guy wire angles, anchor types, support structure components cataloged per pole</span>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.65rem 0.85rem;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.1);border-radius:10px;">
+                        <span style="color:#00d4ff;font-size:0.9rem;flex-shrink:0;margin-top:1px;">✦</span>
+                        <span style="font-size:0.8rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;line-height:1.5;"><strong style="color:#e8f4fd;">Visual inspection</strong> — Woodpeckers, splits, leaning, damaged insulators, corroded hardware captured in imagery</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reveal">
+                <div style="position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(0,212,255,0.15);">
+                    <img src="https://pplx-res.cloudinary.com/image/upload/pplx_search_images/6c3bbc6830e5d5bdaffb08b0b4ce05ba4849533e.jpg" alt="Drone aerial view of utility pole with power lines" style="width:100%;height:260px;object-fit:cover;display:block;opacity:0.85;">
+                    <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(8,14,26,0.85) 0%, rgba(8,14,26,0.2) 60%, transparent 100%);"></div>
+                    <div class="scan-overlay"><div class="scan-line"></div></div>
+                    <div style="position:absolute;bottom:12px;left:16px;right:16px;">
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <span style="padding:3px 8px;background:rgba(0,212,255,0.2);border:1px solid rgba(0,212,255,0.3);border-radius:20px;font-size:0.65rem;color:#00d4ff;font-family:'DM Sans',sans-serif;font-weight:600;">POLE LOCATED ✓</span>
+                            <span style="padding:3px 8px;background:rgba(34,197,94,0.2);border:1px solid rgba(34,197,94,0.3);border-radius:20px;font-size:0.65rem;color:#22c55e;font-family:'DM Sans',sans-serif;font-weight:600;">GEO VERIFIED ✓</span>
+                            <span style="padding:3px 8px;background:rgba(255,126,46,0.2);border:1px solid rgba(255,126,46,0.3);border-radius:20px;font-size:0.65rem;color:#ff7e2e;font-family:'DM Sans',sans-serif;font-weight:600;">ATTACHMENTS LOGGED ✓</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:0.85rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;text-align:center;">
+                    <div style="padding:0.6rem;background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.1);border-radius:10px;">
+                        <div style="font-size:1.2rem;font-family:'Instrument Serif',serif;font-weight:700;color:#00d4ff;" class="stat-glow">360°</div>
+                        <div style="font-size:0.63rem;color:#5a7a96;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">Coverage</div>
+                    </div>
+                    <div style="padding:0.6rem;background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.1);border-radius:10px;">
+                        <div style="font-size:1.2rem;font-family:'Instrument Serif',serif;font-weight:700;color:#00d4ff;" class="stat-glow">cm</div>
+                        <div style="font-size:0.63rem;color:#5a7a96;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">Resolution</div>
+                    </div>
+                    <div style="padding:0.6rem;background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.1);border-radius:10px;">
+                        <div style="font-size:1.2rem;font-family:'Instrument Serif',serif;font-weight:700;color:#ff7e2e;" class="orange-glow">Full</div>
+                        <div style="font-size:0.63rem;color:#5a7a96;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">Load Data</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════ SLIDE 4: GROUNDLINE ═══════════════════════════════════ -->
+<div class="slide slide-4" data-slide="4">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:450px;height:450px;top:-100px;left:-100px;background:radial-gradient(circle,#15803d,transparent 70%);opacity:0.13;"></div>
+        <div class="blob" style="width:300px;height:300px;bottom:-60px;right:10%;background:radial-gradient(circle,#22c55e,transparent 70%);opacity:0.09;"></div>
+    </div>
+
+    <div class="content">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:center;">
+            <div class="reveal">
+                <div style="position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(34,197,94,0.2);">
+                    <img src="https://pplx-res.cloudinary.com/image/upload/pplx_search_images/9a9f7045b3d015d102502e989a32091834939904.jpg" alt="Groundline pole integrity inspection" style="width:100%;height:260px;object-fit:cover;display:block;opacity:0.8;">
+                    <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(8,14,26,0.88) 0%, rgba(8,14,26,0.15) 60%, transparent 100%);"></div>
+                    <div style="position:absolute;bottom:12px;left:16px;right:16px;">
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                            <span style="padding:3px 8px;background:rgba(34,197,94,0.2);border:1px solid rgba(34,197,94,0.3);border-radius:20px;font-size:0.65rem;color:#22c55e;font-family:'DM Sans',sans-serif;font-weight:600;">NON-INVASIVE ✓</span>
+                            <span style="padding:3px 8px;background:rgba(34,197,94,0.2);border:1px solid rgba(34,197,94,0.3);border-radius:20px;font-size:0.65rem;color:#22c55e;font-family:'DM Sans',sans-serif;font-weight:600;">FULL DECAY PROFILE ✓</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:0.85rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;text-align:center;">
+                    <div style="padding:0.65rem;background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.15);border-radius:10px;">
+                        <div style="font-size:1rem;font-family:'Instrument Serif',serif;font-weight:700;color:#22c55e;" class="green-glow">Decay</div>
+                        <div style="font-size:0.62rem;color:#5a7a96;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">Profile</div>
+                    </div>
+                    <div style="padding:0.65rem;background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.15);border-radius:10px;">
+                        <div style="font-size:1rem;font-family:'Instrument Serif',serif;font-weight:700;color:#22c55e;" class="green-glow">Moisture</div>
+                        <div style="font-size:0.62rem;color:#5a7a96;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">Profile</div>
+                    </div>
+                    <div style="padding:0.65rem;background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.15);border-radius:10px;">
+                        <div style="font-size:1rem;font-family:'Instrument Serif',serif;font-weight:700;color:#22c55e;" class="green-glow">Health</div>
+                        <div style="font-size:0.62rem;color:#5a7a96;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">Score</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="reveal section-tag-green">Layer 2 — Groundline Inspection</div>
+                <h2 class="reveal" style="font-family:'Instrument Serif',serif;font-size:clamp(1.8rem,3.2vw,2.6rem);line-height:1.2;margin-bottom:1rem;">What Drone Eyes<br><em>Can't See</em></h2>
+                <p class="reveal" style="color:#a0bdd4;font-size:0.85rem;margin-bottom:1.2rem;font-family:'DM Sans',sans-serif;line-height:1.6;">The most critical failure zone for any wood pole is underground — where moisture and fungi attack the base. Groundline inspection uses non-invasive technology to generate a complete below-grade health picture.</p>
+
+                <div class="reveal" style="display:flex;flex-direction:column;gap:0.6rem;">
+                    <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.65rem 0.85rem;background:rgba(34,197,94,0.04);border:1px solid rgba(34,197,94,0.1);border-radius:10px;">
+                        <span style="color:#22c55e;font-size:0.9rem;flex-shrink:0;margin-top:1px;">✦</span>
+                        <span style="font-size:0.8rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;line-height:1.5;"><strong style="color:#e8f4fd;">Full decay profile</strong> — Percentage of cross-section lost to rot, mapped at multiple depth intervals</span>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.65rem 0.85rem;background:rgba(34,197,94,0.04);border:1px solid rgba(34,197,94,0.1);border-radius:10px;">
+                        <span style="color:#22c55e;font-size:0.9rem;flex-shrink:0;margin-top:1px;">✦</span>
+                        <span style="font-size:0.8rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;line-height:1.5;"><strong style="color:#e8f4fd;">Moisture profile</strong> — Moisture content measurement flags early-stage biological degradation before visible damage</span>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.65rem 0.85rem;background:rgba(34,197,94,0.04);border:1px solid rgba(34,197,94,0.1);border-radius:10px;">
+                        <span style="color:#22c55e;font-size:0.9rem;flex-shrink:0;margin-top:1px;">✦</span>
+                        <span style="font-size:0.8rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;line-height:1.5;"><strong style="color:#e8f4fd;">Ground-level photography</strong> — Anchor confirmations, pole birthmark capture, supplemental images filling drone blind spots</span>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.65rem 0.85rem;background:rgba(34,197,94,0.04);border:1px solid rgba(34,197,94,0.1);border-radius:10px;">
+                        <span style="color:#22c55e;font-size:0.9rem;flex-shrink:0;margin-top:1px;">✦</span>
+                        <span style="font-size:0.8rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;line-height:1.5;"><strong style="color:#e8f4fd;">Health indication score</strong> — Numeric rating feeds directly into the pole's risk matrix as the structural integrity input</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════ SLIDE 5: LIDAR CAPTURE ═══════════════════════════════════ -->
+<div class="slide slide-5" data-slide="5">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:500px;height:500px;top:-100px;right:-80px;background:radial-gradient(circle,#7c3aed,transparent 70%);opacity:0.12;"></div>
+        <div class="blob" style="width:350px;height:350px;bottom:-80px;left:-60px;background:radial-gradient(circle,#a78bfa,transparent 70%);opacity:0.09;"></div>
+    </div>
+    <canvas class="particle-canvas-ambient" style="position:absolute;inset:0;z-index:1;width:100%;height:100%;"></canvas>
+
+    <div class="content">
+        <div class="reveal section-tag-purple">Layer 3 — LiDAR Capture</div>
+        <h2 class="reveal" style="font-family:'Instrument Serif',serif;font-size:clamp(1.8rem,3.2vw,2.6rem);line-height:1.2;margin-bottom:0.4rem;">Three-Mode Point Cloud<br><em>Architecture</em></h2>
+        <p class="reveal" style="color:#a0bdd4;font-size:0.83rem;margin-bottom:1.4rem;font-family:'DM Sans',sans-serif;">LiDAR is deployed in a deliberate hierarchy — fastest and broadest first, then gap-filling modes layer in precision where needed. The result: a seamless, complete point cloud ready for measurement and feature extraction.</p>
+
+        <div class="reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.2rem;">
+            <div class="glass-card" style="padding:1.2rem;border-top:3px solid #a78bfa;">
+                <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.7rem;">
+                    <div class="step-badge" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">1</div>
+                    <span style="font-size:0.8rem;font-weight:700;color:#a78bfa;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">Mobile LiDAR</span>
+                </div>
+                <p style="font-size:0.77rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;line-height:1.55;margin-bottom:0.7rem;">Vehicle-mounted sensor sweeps entire corridors at highway speeds — the fastest way to build a base-layer point cloud across thousands of poles per day.</p>
+                <div style="padding:0.5rem 0.7rem;background:rgba(139,92,246,0.08);border-radius:8px;font-size:0.7rem;color:#a78bfa;font-family:'DM Sans',sans-serif;">🚗 &nbsp;Highest coverage velocity · Best for linear routes</div>
+            </div>
+            <div class="glass-card" style="padding:1.2rem;border-top:3px solid #00d4ff;">
+                <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.7rem;">
+                    <div class="step-badge" style="background:linear-gradient(135deg,#0088cc,#00d4ff);">2</div>
+                    <span style="font-size:0.8rem;font-weight:700;color:#00d4ff;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">Aerial LiDAR</span>
+                </div>
+                <p style="font-size:0.77rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;line-height:1.55;margin-bottom:0.7rem;">Drone or fixed-wing flyover fills occlusion gaps left by mobile capture — vegetation overhang, complex angles, and span geometry that ground-level sensors miss.</p>
+                <div style="padding:0.5rem 0.7rem;background:rgba(0,212,255,0.08);border-radius:8px;font-size:0.7rem;color:#00d4ff;font-family:'DM Sans',sans-serif;">🚁 &nbsp;Gap-filling · Vegetation penetration · Wire geometry</div>
+            </div>
+            <div class="glass-card" style="padding:1.2rem;border-top:3px solid #22c55e;">
+                <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.7rem;">
+                    <div class="step-badge" style="background:linear-gradient(135deg,#15803d,#22c55e);">3</div>
+                    <span style="font-size:0.8rem;font-weight:700;color:#22c55e;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">Terrestrial LiDAR</span>
+                </div>
+                <p style="font-size:0.77rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;line-height:1.55;margin-bottom:0.7rem;">Backpack-mounted sensor deployed only where mobile and aerial cannot achieve required density — confined corridors, dense urban canyons, complex equipment arrays.</p>
+                <div style="padding:0.5rem 0.7rem;background:rgba(34,197,94,0.08);border-radius:8px;font-size:0.7rem;color:#22c55e;font-family:'DM Sans',sans-serif;">🎒 &nbsp;Precision fallback · Urban canyons · Complex geometry</div>
+            </div>
+        </div>
+
+        <div class="reveal" style="padding:0.85rem 1.1rem;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:12px;display:flex;align-items:center;gap:0.85rem;">
+            <span style="font-size:1.1rem;flex-shrink:0;">📡</span>
+            <span style="font-size:0.78rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;line-height:1.5;"><strong style="color:#e8f4fd;">Post-collection processing:</strong> All three modes are merged, classified (ground / pole / wire / vegetation / hardware), measured, and feature-extracted to produce the geometric inputs required for SPIDAcalc's JSON schema.</span>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════ SLIDE 6: LIDAR POINT CLOUD VISUAL ═══════════════════════════════════ -->
+<div class="slide slide-6" data-slide="6">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:500px;height:500px;top:-120px;left:-80px;background:radial-gradient(circle,#7c3aed,transparent 70%);opacity:0.13;"></div>
+        <div class="blob" style="width:350px;height:350px;bottom:-80px;right:-50px;background:radial-gradient(circle,#00d4ff,transparent 70%);opacity:0.09;"></div>
+    </div>
+
+    <div class="content">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:center;">
+            <div>
+                <div class="reveal section-tag-purple">LiDAR Processing Pipeline</div>
+                <h2 class="reveal" style="font-family:'Instrument Serif',serif;font-size:clamp(1.7rem,3vw,2.4rem);line-height:1.2;margin-bottom:1rem;">From Raw Point Cloud<br><em>to Extracted Features</em></h2>
+
+                <div class="reveal" style="display:flex;flex-direction:column;gap:0;">
+                    <div style="display:flex;gap:1rem;padding:0.8rem 0;">
+                        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+                            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;">1</div>
+                            <div style="width:2px;flex:1;background:linear-gradient(to bottom,#7c3aed,rgba(139,92,246,0.2));margin-top:4px;min-height:20px;"></div>
+                        </div>
+                        <div style="padding-bottom:0.6rem;">
+                            <div style="font-size:0.83rem;font-weight:600;color:#e8f4fd;font-family:'DM Sans',sans-serif;">Ingest &amp; Merge</div>
+                            <div style="font-size:0.75rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">Combine mobile, aerial, and terrestrial scans into unified coordinate space</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:1rem;padding:0.8rem 0;">
+                        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+                            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;">2</div>
+                            <div style="width:2px;flex:1;background:linear-gradient(to bottom,rgba(139,92,246,0.6),rgba(139,92,246,0.1));margin-top:4px;min-height:20px;"></div>
+                        </div>
+                        <div style="padding-bottom:0.6rem;">
+                            <div style="font-size:0.83rem;font-weight:600;color:#e8f4fd;font-family:'DM Sans',sans-serif;">Classification</div>
+                            <div style="font-size:0.75rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">AI + rule-based segmentation: ground / pole / conductor / vegetation / hardware</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:1rem;padding:0.8rem 0;">
+                        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+                            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;">3</div>
+                            <div style="width:2px;flex:1;background:linear-gradient(to bottom,rgba(139,92,246,0.3),rgba(139,92,246,0.05));margin-top:4px;min-height:20px;"></div>
+                        </div>
+                        <div style="padding-bottom:0.6rem;">
+                            <div style="font-size:0.83rem;font-weight:600;color:#e8f4fd;font-family:'DM Sans',sans-serif;">Measurement</div>
+                            <div style="font-size:0.75rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">Pole height, taper, groundline circumference, attachment heights, wire sag, span length</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:1rem;padding:0.8rem 0;">
+                        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+                            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#ff7e2e,#fbbf24);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;">4</div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.83rem;font-weight:600;color:#e8f4fd;font-family:'DM Sans',sans-serif;">Feature Extraction → JSON</div>
+                            <div style="font-size:0.75rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">Structured output mapped to SPIDAcalc schema fields — ready for upload</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reveal">
+                <div style="position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(139,92,246,0.2);">
+                    <img src="https://pplx-res.cloudinary.com/image/upload/pplx_search_images/cdd967ea85601eb435eb0a04ef64134d235bfb79.jpg" alt="LiDAR point cloud of utility transmission tower" style="width:100%;height:260px;object-fit:cover;display:block;opacity:0.85;">
+                    <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(8,14,26,0.85) 0%, rgba(8,14,26,0.15) 60%, transparent 100%);"></div>
+                    <div style="position:absolute;top:12px;right:12px;padding:4px 10px;background:rgba(139,92,246,0.3);border:1px solid rgba(139,92,246,0.4);border-radius:20px;font-size:0.65rem;color:#a78bfa;font-family:'DM Sans',sans-serif;font-weight:700;">POINT CLOUD VIEW</div>
+                </div>
+
+                <div style="margin-top:0.85rem;display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+                    <div style="padding:0.75rem;background:rgba(139,92,246,0.05);border:1px solid rgba(139,92,246,0.15);border-radius:10px;">
+                        <div style="font-size:0.75rem;font-weight:600;color:#a78bfa;font-family:'DM Sans',sans-serif;margin-bottom:0.25rem;">Extracted: Wire Geometry</div>
+                        <div style="font-size:0.7rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">Sag, span length, attachment height, catenary profiles</div>
+                    </div>
+                    <div style="padding:0.75rem;background:rgba(139,92,246,0.05);border:1px solid rgba(139,92,246,0.15);border-radius:10px;">
+                        <div style="font-size:0.75rem;font-weight:600;color:#a78bfa;font-family:'DM Sans',sans-serif;margin-bottom:0.25rem;">Extracted: Pole Geometry</div>
+                        <div style="font-size:0.7rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">Height, class, taper, lean angle, groundline circumference</div>
+                    </div>
+                    <div style="padding:0.75rem;background:rgba(139,92,246,0.05);border:1px solid rgba(139,92,246,0.15);border-radius:10px;">
+                        <div style="font-size:0.75rem;font-weight:600;color:#a78bfa;font-family:'DM Sans',sans-serif;margin-bottom:0.25rem;">Extracted: Guy Wires</div>
+                        <div style="font-size:0.7rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">Angle, attachment height, anchor location, wire size</div>
+                    </div>
+                    <div style="padding:0.75rem;background:rgba(139,92,246,0.05);border:1px solid rgba(139,92,246,0.15);border-radius:10px;">
+                        <div style="font-size:0.75rem;font-weight:600;color:#a78bfa;font-family:'DM Sans',sans-serif;margin-bottom:0.25rem;">Extracted: Clearances</div>
+                        <div style="font-size:0.7rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">Ground clearance, vertical separation between attachers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════ SLIDE 7: JSON SCHEMA AUTOMATION ═══════════════════════════════════ -->
+<div class="slide slide-7" data-slide="7">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:450px;height:450px;top:-100px;right:-80px;background:radial-gradient(circle,#cc5500,transparent 70%);opacity:0.12;"></div>
+        <div class="blob" style="width:300px;height:300px;bottom:-60px;left:5%;background:radial-gradient(circle,#ff7e2e,transparent 70%);opacity:0.09;"></div>
+    </div>
+
+    <div class="content">
+        <div class="reveal section-tag-orange">Layer 4 — JSON Generation</div>
+        <h2 class="reveal" style="font-family:'Instrument Serif',serif;font-size:clamp(1.7rem,3.2vw,2.5rem);line-height:1.2;margin-bottom:0.4rem;">Automated Schema Compilation<br><em>for SPIDAcalc</em></h2>
+        <p class="reveal" style="color:#a0bdd4;font-size:0.82rem;margin-bottom:1.3rem;font-family:'DM Sans',sans-serif;">All collected data — drone observations, groundline scores, and LiDAR measurements — is automatically mapped to SPIDAcalc's open JSON schema. One pole, one JSON object, ready for bulk upload to SPIDAstudio.</p>
+
+        <div class="reveal" style="display:grid;grid-template-columns:1.2fr 0.05fr 1.2fr;gap:0.5rem;align-items:center;margin-bottom:1rem;">
+            <div style="padding:1rem;background:rgba(255,255,255,0.03);border:1px solid rgba(0,212,255,0.15);border-radius:12px;">
+                <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#5a7a96;font-family:'DM Sans',sans-serif;margin-bottom:0.6rem;">Data Sources Feeding JSON</div>
+                <div style="display:flex;flex-direction:column;gap:0.35rem;">
+                    <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.6rem;background:rgba(0,212,255,0.06);border-radius:8px;">
+                        <span style="width:8px;height:8px;border-radius:50%;background:#00d4ff;flex-shrink:0;"></span>
+                        <span style="font-size:0.73rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;">Drone: pole type, owner, attachments, hardware</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.6rem;background:rgba(34,197,94,0.06);border-radius:8px;">
+                        <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;"></span>
+                        <span style="font-size:0.73rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;">Groundline: strength reduction, condition code</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.6rem;background:rgba(139,92,246,0.06);border-radius:8px;">
+                        <span style="width:8px;height:8px;border-radius:50%;background:#a78bfa;flex-shrink:0;"></span>
+                        <span style="font-size:0.73rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;">LiDAR: height, circumference, wire sag, spans</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.6rem;background:rgba(255,126,46,0.06);border-radius:8px;">
+                        <span style="width:8px;height:8px;border-radius:50%;background:#ff7e2e;flex-shrink:0;"></span>
+                        <span style="font-size:0.73rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;">GIS: coordinates, circuit, region, asset owner</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align:center;font-size:1.4rem;color:#ff7e2e;opacity:0.8;">→</div>
+
+            <div style="padding:1rem;background:rgba(255,126,46,0.04);border:1px solid rgba(255,126,46,0.2);border-radius:12px;font-family:monospace;font-size:0.68rem;line-height:1.6;color:#a0bdd4;overflow:hidden;">
+                <div style="color:#ff7e2e;margin-bottom:0.3rem;font-family:'DM Sans',sans-serif;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;">SPIDAcalc JSON Schema</div>
+                <div><span style="color:#a78bfa;">"pole"</span>: {</div>
+                <div style="padding-left:1em;"><span style="color:#22c55e;">"id"</span>: <span style="color:#fbbf24;">"FTD-0012847"</span>,</div>
+                <div style="padding-left:1em;"><span style="color:#22c55e;">"species"</span>: <span style="color:#fbbf24;">"Southern Yellow Pine"</span>,</div>
+                <div style="padding-left:1em;"><span style="color:#22c55e;">"class"</span>: <span style="color:#fbbf24;">"2"</span>,</div>
+                <div style="padding-left:1em;"><span style="color:#22c55e;">"height"</span>: <span style="color:#00d4ff;">45</span>,</div>
+                <div style="padding-left:1em;"><span style="color:#22c55e;">"glcircumference"</span>: <span style="color:#00d4ff;">48.2</span>,</div>
+                <div style="padding-left:1em;"><span style="color:#22c55e;">"condition"</span>: <span style="color:#fbbf24;">"Average"</span>,</div>
+                <div style="padding-left:1em;"><span style="color:#22c55e;">"wireEndPoints"</span>: [...],</div>
+                <div style="padding-left:1em;"><span style="color:#22c55e;">"wires"</span>: [{</div>
+                <div style="padding-left:2em;"><span style="color:#22c55e;">"owner"</span>: <span style="color:#fbbf24;">"AT&T"</span>,</div>
+                <div style="padding-left:2em;"><span style="color:#22c55e;">"attachHeight"</span>: <span style="color:#00d4ff;">28.5</span></div>
+                <div style="padding-left:1em;">}]</div>
+                <div>}</div>
+            </div>
+        </div>
+
+        <div class="reveal" style="padding:0.75rem 1rem;background:rgba(255,126,46,0.06);border:1px solid rgba(255,126,46,0.15);border-radius:10px;display:flex;align-items:center;gap:0.75rem;">
+            <span style="color:#ff7e2e;font-size:1rem;flex-shrink:0;">⚡</span>
+            <span style="font-size:0.77rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;"><strong style="color:#e8f4fd;">At scale:</strong> The automation pipeline generates one valid SPIDAcalc JSON object per pole — batch-compiled and validated before upload to SPIDAstudio for parallel cloud processing of thousands of poles simultaneously.</span>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════ SLIDE 8: SPIDACALC LOAD CALCULATIONS ═══════════════════════════════════ -->
+<div class="slide slide-8" data-slide="8">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:450px;height:450px;top:-100px;left:-80px;background:radial-gradient(circle,#0088cc,transparent 70%);opacity:0.12;"></div>
+        <div class="blob" style="width:300px;height:300px;bottom:-60px;right:10%;background:radial-gradient(circle,#00d4ff,transparent 70%);opacity:0.08;"></div>
+    </div>
+
+    <div class="content">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
+            <div>
+                <div class="reveal section-tag">Layer 4 — SPIDAcalc &amp; SPIDAstudio</div>
+                <h2 class="reveal" style="font-family:'Instrument Serif',serif;font-size:clamp(1.7rem,3vw,2.4rem);line-height:1.2;margin-bottom:0.9rem;">Load Calculations<br><em>at Cloud Scale</em></h2>
+
+                <div class="reveal" style="display:flex;flex-direction:column;gap:0.75rem;">
+                    <div class="glass-card" style="padding:0.85rem 1rem;display:flex;align-items:flex-start;gap:0.75rem;">
+                        <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,212,255,0.1);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">📤</div>
+                        <div>
+                            <div style="font-size:0.82rem;font-weight:600;color:#e8f4fd;font-family:'DM Sans',sans-serif;margin-bottom:0.2rem;">Bulk Upload to SPIDAstudio</div>
+                            <div style="font-size:0.73rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">JSON files uploaded in batches — SPIDAstudio's cloud engine analyzes thousands of complex poles in minutes, not days</div>
+                        </div>
+                    </div>
+                    <div class="glass-card" style="padding:0.85rem 1rem;display:flex;align-items:flex-start;gap:0.75rem;">
+                        <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,212,255,0.1);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">⚖️</div>
+                        <div>
+                            <div style="font-size:0.82rem;font-weight:600;color:#e8f4fd;font-family:'DM Sans',sans-serif;margin-bottom:0.2rem;">Compliance Standards Applied</div>
+                            <div style="font-size:0.73rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;"><strong style="color:#a0bdd4;">GO95</strong> (California) and <strong style="color:#a0bdd4;">NESC</strong> (nationwide) — load cases applied per asset owner jurisdiction</div>
+                        </div>
+                    </div>
+                    <div class="glass-card" style="padding:0.85rem 1rem;display:flex;align-items:flex-start;gap:0.75rem;">
+                        <div style="width:36px;height:36px;border-radius:10px;background:rgba(34,197,94,0.1);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">✅</div>
+                        <div>
+                            <div style="font-size:0.82rem;font-weight:600;color:#e8f4fd;font-family:'DM Sans',sans-serif;margin-bottom:0.2rem;">Pass / Flag / Remediate</div>
+                            <div style="font-size:0.73rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">Safety factor results flag poles needing attention; SPIDAcalc desktop supports make-ready modeling for proposed attachments</div>
+                        </div>
+                    </div>
+                    <div class="glass-card" style="padding:0.85rem 1rem;display:flex;align-items:flex-start;gap:0.75rem;">
+                        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,126,46,0.1);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">🏗️</div>
+                        <div>
+                            <div style="font-size:0.82rem;font-weight:600;color:#e8f4fd;font-family:'DM Sans',sans-serif;margin-bottom:0.2rem;">Make-Ready Modeling</div>
+                            <div style="font-size:0.73rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">If current pole cannot support new or existing load, model in a replacement pole — full geometric nonlinear analysis with 3D visualization</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reveal">
+                <div style="position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(0,212,255,0.15);margin-bottom:0.85rem;">
+                    <img src="https://pplx-res.cloudinary.com/image/upload/pplx_search_images/4002f3e482d58f9d418fe78d61597b9979931ea7.jpg" alt="Pole loading analysis software interface" style="width:100%;height:180px;object-fit:cover;display:block;opacity:0.85;">
+                    <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(8,14,26,0.8) 0%, rgba(8,14,26,0.1) 70%, transparent 100%);"></div>
+                    <div style="position:absolute;top:10px;right:10px;padding:3px 9px;background:rgba(0,212,255,0.2);border:1px solid rgba(0,212,255,0.3);border-radius:20px;font-size:0.62rem;color:#00d4ff;font-family:'DM Sans',sans-serif;font-weight:700;">SPIDAstudio</div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+                    <div style="padding:0.85rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:12px;text-align:center;">
+                        <div style="font-size:1.4rem;font-weight:700;font-family:'Instrument Serif',serif;color:#22c55e;" class="green-glow">PASS</div>
+                        <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#5a7a96;font-family:'DM Sans',sans-serif;margin-top:0.2rem;">Safety Factor ≥ 1.0</div>
+                        <div style="margin-top:0.5rem;height:6px;background:rgba(34,197,94,0.1);border-radius:3px;overflow:hidden;">
+                            <div class="bar-fill" data-width="78" style="background:linear-gradient(90deg,#15803d,#22c55e);height:100%;"></div>
+                        </div>
+                        <div style="font-size:0.62rem;color:#5a7a96;font-family:'DM Sans',sans-serif;margin-top:0.3rem;">~78% of poles</div>
+                    </div>
+                    <div style="padding:0.85rem;background:rgba(255,126,46,0.06);border:1px solid rgba(255,126,46,0.15);border-radius:12px;text-align:center;">
+                        <div style="font-size:1.4rem;font-weight:700;font-family:'Instrument Serif',serif;color:#ff7e2e;" class="orange-glow">FLAG</div>
+                        <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#5a7a96;font-family:'DM Sans',sans-serif;margin-top:0.2rem;">Needs Attention</div>
+                        <div style="margin-top:0.5rem;height:6px;background:rgba(255,126,46,0.1);border-radius:3px;overflow:hidden;">
+                            <div class="bar-fill" data-width="22" style="background:linear-gradient(90deg,#cc5500,#ff7e2e);height:100%;"></div>
+                        </div>
+                        <div style="font-size:0.62rem;color:#5a7a96;font-family:'DM Sans',sans-serif;margin-top:0.3rem;">~22% flagged</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════ SLIDE 9: RISK MATRIX ═══════════════════════════════════ -->
+<div class="slide slide-9" data-slide="9">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:500px;height:500px;top:-100px;right:-80px;background:radial-gradient(circle,#b45309,transparent 70%);opacity:0.12;"></div>
+        <div class="blob" style="width:300px;height:300px;bottom:-60px;left:5%;background:radial-gradient(circle,#fbbf24,transparent 70%);opacity:0.08;"></div>
+    </div>
+    <canvas class="particle-canvas-ambient" style="position:absolute;inset:0;z-index:1;width:100%;height:100%;"></canvas>
+
+    <div class="content">
+        <div class="reveal" style="display:flex;align-items:center;gap:10px;margin-bottom:0.75rem;">
+            <div class="section-tag" style="background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.25);color:#fbbf24;margin-bottom:0;">Layer 5 — Risk Matrix</div>
+        </div>
+        <h2 class="reveal" style="font-family:'Instrument Serif',serif;font-size:clamp(1.8rem,3.2vw,2.6rem);line-height:1.2;margin-bottom:0.4rem;">The All-in-One <em>Pole Health Index</em></h2>
+        <p class="reveal" style="color:#a0bdd4;font-size:0.82rem;margin-bottom:1.3rem;font-family:'DM Sans',sans-serif;">Every data stream feeds a living risk score — updated in real time as conditions change, weather events occur, or new inspections are completed.</p>
+
+        <div class="reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.85rem;margin-bottom:1rem;">
+            <div class="glass-card" style="padding:0.85rem;border-left:3px solid #00d4ff;">
+                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#00d4ff;font-family:'DM Sans',sans-serif;font-weight:700;margin-bottom:0.4rem;">Input 1</div>
+                <div style="font-size:0.78rem;font-weight:600;color:#e8f4fd;font-family:'DM Sans',sans-serif;margin-bottom:0.25rem;">Visual Inspection</div>
+                <div style="font-size:0.7rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">Drone imagery — damage, lean, hardware condition, attachment anomalies</div>
+            </div>
+            <div class="glass-card" style="padding:0.85rem;border-left:3px solid #22c55e;">
+                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#22c55e;font-family:'DM Sans',sans-serif;font-weight:700;margin-bottom:0.4rem;">Input 2</div>
+                <div style="font-size:0.78rem;font-weight:600;color:#e8f4fd;font-family:'DM Sans',sans-serif;margin-bottom:0.25rem;">Integrity Score</div>
+                <div style="font-size:0.7rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">Groundline decay %, moisture content, health classification (Good / Average / Poor)</div>
+            </div>
+            <div class="glass-card" style="padding:0.85rem;border-left:3px solid #a78bfa;">
+                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#a78bfa;font-family:'DM Sans',sans-serif;font-weight:700;margin-bottom:0.4rem;">Input 3</div>
+                <div style="font-size:0.78rem;font-weight:600;color:#e8f4fd;font-family:'DM Sans',sans-serif;margin-bottom:0.25rem;">Load Compliance</div>
+                <div style="font-size:0.7rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">SPIDAcalc safety factor result — pass margin, overload %, flagged conditions</div>
+            </div>
+            <div class="glass-card" style="padding:0.85rem;border-left:3px solid #ff7e2e;">
+                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#ff7e2e;font-family:'DM Sans',sans-serif;font-weight:700;margin-bottom:0.4rem;">Input 4</div>
+                <div style="font-size:0.78rem;font-weight:600;color:#e8f4fd;font-family:'DM Sans',sans-serif;margin-bottom:0.25rem;">Vegetation Encroachment</div>
+                <div style="font-size:0.7rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">Tree proximity, canopy contact risk, trimming priority scoring from LiDAR + imagery</div>
+            </div>
+            <div class="glass-card" style="padding:0.85rem;border-left:3px solid #fbbf24;">
+                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#fbbf24;font-family:'DM Sans',sans-serif;font-weight:700;margin-bottom:0.4rem;">Input 5</div>
+                <div style="font-size:0.78rem;font-weight:600;color:#e8f4fd;font-family:'DM Sans',sans-serif;margin-bottom:0.25rem;">Weather Modeling</div>
+                <div style="font-size:0.7rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">Built-in wind / ice / temperature models update pole stress estimates in real time</div>
+            </div>
+            <div class="glass-card" style="padding:0.85rem;border-left:3px solid #94a3b8;">
+                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;font-family:'DM Sans',sans-serif;font-weight:700;margin-bottom:0.4rem;">Input 6</div>
+                <div style="font-size:0.78rem;font-weight:600;color:#e8f4fd;font-family:'DM Sans',sans-serif;margin-bottom:0.25rem;">Legacy Data Integration</div>
+                <div style="font-size:0.7rem;color:#5a7a96;font-family:'DM Sans',sans-serif;line-height:1.4;">Asset owner's historical inspections layered in to deepen accuracy and accelerate matrix reliability</div>
+            </div>
+        </div>
+
+        <div class="reveal" style="padding:0.8rem 1rem;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.15);border-radius:10px;display:flex;align-items:center;gap:0.8rem;">
+            <span style="font-size:1.1rem;flex-shrink:0;">🛡️</span>
+            <span style="font-size:0.77rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;"><strong style="color:#fbbf24;">Output:</strong> Every pole receives a composite risk score — Green (healthy), Yellow (monitor), Red (remediate immediately) — giving asset owners a live view of their entire infrastructure's risk exposure across 950,000+ poles.</span>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════ SLIDE 10: SCALE & PLATFORM ═══════════════════════════════════ -->
+<div class="slide slide-10" data-slide="10">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:550px;height:550px;top:-120px;right:-100px;background:radial-gradient(circle,#0088cc,transparent 70%);opacity:0.14;"></div>
+        <div class="blob" style="width:350px;height:350px;bottom:-80px;left:-60px;background:radial-gradient(circle,#00d4ff,transparent 70%);opacity:0.09;"></div>
+        <div class="blob" style="width:250px;height:250px;top:50%;left:40%;background:radial-gradient(circle,#ff7e2e,transparent 70%);opacity:0.07;"></div>
+    </div>
+    <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1;width:100%;height:100%;"></canvas>
+
+    <div class="content" style="text-align:center;">
+        <div class="reveal section-tag" style="display:inline-flex;margin:0 auto 1rem;">The Platform</div>
+        <h2 class="reveal" style="font-family:'Instrument Serif',serif;font-size:clamp(1.8rem,3.5vw,3rem);line-height:1.2;margin-bottom:0.5rem;">Infrastructure Intelligence<br><em>That Runs at Scale</em></h2>
+        <p class="reveal" style="color:#a0bdd4;font-size:0.85rem;margin-bottom:2rem;max-width:700px;margin-left:auto;margin-right:auto;font-family:'DM Sans',sans-serif;line-height:1.6;">The all-in-one platform hosts every data layer for every pole — accessible, queryable, and actionable. Not just a data repository — a living intelligence system for infrastructure owners.</p>
+
+        <div class="reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;">
+            <div class="glass-card" style="padding:1.2rem 0.85rem;text-align:center;">
+                <div style="font-size:2.2rem;font-family:'Instrument Serif',serif;font-weight:700;background:linear-gradient(135deg,#00d4ff,#e8f4fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" class="glow-pulse">950K+</div>
+                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#5a7a96;font-family:'DM Sans',sans-serif;margin-top:0.3rem;">Poles Collected</div>
+                <div style="font-size:0.7rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;margin-top:0.5rem;">in 18 months of active field ops</div>
+            </div>
+            <div class="glass-card" style="padding:1.2rem 0.85rem;text-align:center;">
+                <div style="font-size:2.2rem;font-family:'Instrument Serif',serif;font-weight:700;color:#ff7e2e;" class="orange-glow">5</div>
+                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#5a7a96;font-family:'DM Sans',sans-serif;margin-top:0.3rem;">Data Layers</div>
+                <div style="font-size:0.7rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;margin-top:0.5rem;">fused per pole into one record</div>
+            </div>
+            <div class="glass-card" style="padding:1.2rem 0.85rem;text-align:center;">
+                <div style="font-size:2.2rem;font-family:'Instrument Serif',serif;font-weight:700;color:#22c55e;" class="green-glow">3</div>
+                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#5a7a96;font-family:'DM Sans',sans-serif;margin-top:0.3rem;">LiDAR Modes</div>
+                <div style="font-size:0.7rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;margin-top:0.5rem;">mobile, aerial, terrestrial fusion</div>
+            </div>
+            <div class="glass-card" style="padding:1.2rem 0.85rem;text-align:center;">
+                <div style="font-size:2.2rem;font-family:'Instrument Serif',serif;font-weight:700;color:#a78bfa;" style="text-shadow:0 0 20px rgba(139,92,246,0.5);">Real</div>
+                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#5a7a96;font-family:'DM Sans',sans-serif;margin-top:0.3rem;">Time Updates</div>
+                <div style="font-size:0.7rem;color:#a0bdd4;font-family:'DM Sans',sans-serif;margin-top:0.5rem;">weather + inspection sync</div>
+            </div>
+        </div>
+
+        <div class="reveal" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;flex-wrap:wrap;">
+            <div style="padding:0.5rem 1rem;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);border-radius:24px;font-size:0.75rem;color:#00d4ff;font-family:'DM Sans',sans-serif;font-weight:600;">🚁 Drone Imagery</div>
+            <div style="color:#5a7a96;font-size:0.9rem;">+</div>
+            <div style="padding:0.5rem 1rem;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.15);border-radius:24px;font-size:0.75rem;color:#22c55e;font-family:'DM Sans',sans-serif;font-weight:600;">🔬 Groundline</div>
+            <div style="color:#5a7a96;font-size:0.9rem;">+</div>
+            <div style="padding:0.5rem 1rem;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);border-radius:24px;font-size:0.75rem;color:#a78bfa;font-family:'DM Sans',sans-serif;font-weight:600;">📡 LiDAR</div>
+            <div style="color:#5a7a96;font-size:0.9rem;">+</div>
+            <div style="padding:0.5rem 1rem;background:rgba(255,126,46,0.08);border:1px solid rgba(255,126,46,0.15);border-radius:24px;font-size:0.75rem;color:#ff7e2e;font-family:'DM Sans',sans-serif;font-weight:600;">⚙️ SPIDAcalc</div>
+            <div style="color:#5a7a96;font-size:0.9rem;">+</div>
+            <div style="padding:0.5rem 1rem;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.15);border-radius:24px;font-size:0.75rem;color:#fbbf24;font-family:'DM Sans',sans-serif;font-weight:600;">🛡️ Risk Matrix</div>
+            <div style="color:#5a7a96;font-size:0.9rem;">=</div>
+            <div style="padding:0.5rem 1.2rem;background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(0,136,204,0.1));border:1px solid rgba(0,212,255,0.3);border-radius:24px;font-size:0.8rem;color:#00d4ff;font-family:'DM Sans',sans-serif;font-weight:700;text-shadow:0 0 10px rgba(0,212,255,0.5);">Pole Intelligence™</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════ SLIDE 11: CLOSING / FTD LAUNCH ═══════════════════════════════════ -->
+<div class="slide slide-11" data-slide="11">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:600px;height:600px;top:-150px;right:-120px;background:radial-gradient(circle,#0088cc,transparent 70%);opacity:0.18;"></div>
+        <div class="blob" style="width:400px;height:400px;bottom:-100px;left:-80px;background:radial-gradient(circle,#00d4ff,transparent 70%);opacity:0.12;"></div>
+        <div class="blob" style="width:280px;height:280px;top:35%;left:15%;background:radial-gradient(circle,#ff7e2e,transparent 70%);opacity:0.09;"></div>
+        <div class="blob" style="width:200px;height:200px;bottom:25%;right:20%;background:radial-gradient(circle,#22c55e,transparent 70%);opacity:0.08;"></div>
+    </div>
+    <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1;width:100%;height:100%;"></canvas>
+    <div class="deco-shape" data-speed="0.02" style="top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(0,212,255,0.02) 60px),repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(0,212,255,0.02) 60px);"></div>
+
+    <div class="content text-center">
+        <div class="reveal" style="font-size:clamp(2.4rem,5vw,4.2rem);font-family:'Instrument Serif',serif;font-weight:400;line-height:1.1;margin-bottom:0.75rem;background:linear-gradient(135deg,#00d4ff 0%,#e8f4fd 50%,#ff7e2e 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+            The Future of Utility
+        </div>
+        <div class="reveal" style="font-size:clamp(2.4rem,5vw,4.2rem);font-family:'Instrument Serif',serif;font-weight:400;font-style:italic;line-height:1.1;color:#a0bdd4;margin-bottom:1.5rem;">
+            Infrastructure Management
+        </div>
+
+        <p class="reveal" style="font-size:0.9rem;color:#5a7a96;max-width:600px;margin:0 auto 2rem;font-family:'DM Sans',sans-serif;line-height:1.7;">From the first drone flight to a fully automated JSON pipeline feeding SPIDAcalc — every pole inspected, measured, scored, and monitored. This is what it looks like when data collection, geospatial intelligence, and compliance automation converge.</p>
+
+        <div class="reveal" style="display:flex;align-items:center;justify-content:center;gap:1.5rem;margin-bottom:2rem;flex-wrap:wrap;">
+            <div style="text-align:center;">
+                <div style="font-size:1.8rem;font-family:'Instrument Serif',serif;font-weight:700;color:#00d4ff;" class="stat-glow">950,000+</div>
+                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:#5a7a96;font-family:'DM Sans',sans-serif;">Poles &amp; Counting</div>
+            </div>
+            <div style="width:1px;height:40px;background:rgba(0,212,255,0.2);"></div>
+            <div style="text-align:center;">
+                <div style="font-size:1.8rem;font-family:'Instrument Serif',serif;font-weight:700;color:#22c55e;" class="green-glow">GO95 + NESC</div>
+                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:#5a7a96;font-family:'DM Sans',sans-serif;">Compliance Ready</div>
+            </div>
+            <div style="width:1px;height:40px;background:rgba(0,212,255,0.2);"></div>
+            <div style="text-align:center;">
+                <div style="font-size:1.8rem;font-family:'Instrument Serif',serif;font-weight:700;color:#ff7e2e;" class="orange-glow">Real-Time</div>
+                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:#5a7a96;font-family:'DM Sans',sans-serif;">Risk Intelligence</div>
+            </div>
+        </div>
+
+        <div class="reveal" style="display:inline-flex;align-items:center;gap:10px;padding:10px 28px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.25);border-radius:30px;">
+            <span style="color:#00d4ff;font-size:0.75rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;font-family:'DM Sans',sans-serif;">FTD Launch</span>
+            <span style="color:rgba(0,212,255,0.3);">•</span>
+            <span style="color:#5a7a96;font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;font-family:'DM Sans',sans-serif;">Pole Intelligence Platform</span>
+        </div>
+    </div>
+</div>
+
+</div><!-- end .deck -->
+
+<div class="nav-controls">
+    <button class="nav-btn" onclick="changeSlide(-1)">&#8249;</button>
+    <div class="slide-dots" id="dots"></div>
+    <button class="nav-btn" onclick="changeSlide(1)">&#8250;</button>
+    <span class="slide-counter" id="counter">1 / 11</span>
+</div>
+
+<script>
+    function animateSlide(slide) {
+        if (!slide || slide.dataset.animated === 'true') return;
+        slide.dataset.animated = 'true';
+        slide.classList.add('is-visible');
+        slide.querySelectorAll('.reveal').forEach((el, i) => {
+            el.style.transition = 'none';
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.offsetHeight;
+            const delay = i * 0.07;
+            el.style.transition = `opacity 0.45s ease ${delay}s, transform 0.45s ease ${delay}s`;
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0px)';
+        });
+        animateSlideEffects(slide);
+    }
+
+    function animateSlideEffects(slide) {
+        slide.querySelectorAll('[data-count]:not(.counted)').forEach(el => {
+            el.classList.add('counted');
+            const target = parseInt(el.dataset.count || '0', 10);
+            const suffix = el.dataset.suffix || '', prefix = el.dataset.prefix || '';
+            let cur = 0; const step = target / 40;
+            const timer = setInterval(() => {
+                cur += step;
+                if (cur >= target) { cur = target; clearInterval(timer); }
+                el.textContent = prefix + Math.round(cur).toLocaleString() + suffix;
+            }, 30);
+        });
+
+        slide.querySelectorAll('.odometer:not(.odo-init)').forEach(el => {
+            el.classList.add('odo-init');
+            const target = el.dataset.value || '0', suffix = el.dataset.suffix || '', prefix = el.dataset.prefix || '';
+            el.innerHTML = '';
+            if (prefix) { const s = document.createElement('span'); s.className = 'odometer-separator'; s.textContent = prefix; el.appendChild(s); }
+            target.split('').forEach((char, i) => {
+                if (char === '.' || char === ',') { const sep = document.createElement('span'); sep.className = 'odometer-separator'; sep.textContent = char; el.appendChild(sep); return; }
+                const digit = parseInt(char, 10);
+                if (Number.isNaN(digit)) { const sep = document.createElement('span'); sep.className = 'odometer-separator'; sep.textContent = char; el.appendChild(sep); return; }
+                const col = document.createElement('div'); col.className = 'odometer-digit';
+                for (let n = 0; n <= 9; n++) { const s = document.createElement('span'); s.textContent = n; col.appendChild(s); }
+                col.style.transform = 'translateY(0)'; el.appendChild(col);
+                setTimeout(() => { col.style.transform = `translateY(-${digit}em)`; }, 200 + i * 150);
+            });
+            if (suffix) { const s = document.createElement('span'); s.className = 'odometer-separator'; s.textContent = suffix; el.appendChild(s); }
+        });
+
+        slide.querySelectorAll('.bar-chart:not(.bar-init)').forEach(chart => {
+            chart.classList.add('bar-init');
+            chart.querySelectorAll('.bar').forEach((bar, i) => {
+                bar.style.height = '0%';
+                bar.style.transition = `height 0.5s ease ${i * 0.06}s`;
+                bar.offsetHeight;
+                bar.style.height = bar.dataset.height + '%';
+            });
+        });
+
+        slide.querySelectorAll('.bar-fill:not(.fill-init)').forEach((bar, i) => {
+            bar.classList.add('fill-init');
+            bar.style.width = '0%';
+            bar.style.transition = `width 0.5s ease ${i * 0.08}s`;
+            bar.offsetHeight;
+            bar.style.width = bar.dataset.width + '%';
+        });
+
+        slide.querySelectorAll('.donut-ring:not(.ring-init)').forEach(ring => {
+            ring.classList.add('ring-init');
+            ring.style.strokeDashoffset = '251.3';
+            ring.style.transition = 'stroke-dashoffset 0.8s ease';
+            ring.offsetHeight;
+            ring.style.strokeDashoffset = 251.3 - ((parseInt(ring.dataset.percent || '0', 10) / 100) * 251.3);
+        });
+
+        slide.querySelectorAll('.line-path:not(.line-init)').forEach(line => {
+            line.classList.add('line-init');
+            line.style.transition = 'stroke-dashoffset 1s ease';
+            line.style.strokeDashoffset = '0';
+            const svg = line.closest('svg');
+            if (svg) {
+                const area = svg.querySelector('.line-area');
+                if (area) { area.style.transition = 'opacity 0.6s ease 0.4s'; area.style.opacity = '1'; }
+                const dots = svg.querySelector('.line-dots');
+                if (dots) { dots.style.transition = 'opacity 0.4s ease 0.8s'; dots.style.opacity = '1'; }
+            }
+        });
+
+        slide.querySelectorAll('.radar-shape:not(.radar-init)').forEach(shape => {
+            shape.classList.add('radar-init');
+            shape.style.transition = 'stroke-dashoffset 0.8s ease';
+            shape.style.strokeDashoffset = '0';
+            const dots = shape.closest('svg')?.querySelector('.radar-dots');
+            if (dots) { dots.style.transition = 'opacity 0.4s ease 0.6s'; dots.style.opacity = '1'; }
+        });
+    }
+
+    document.addEventListener('mousemove', (e) => {
+        const spotlight = document.querySelector('.mouse-spotlight');
+        if (spotlight) {
+            const rgb = getComputedStyle(document.documentElement).getPropertyValue('--glow-color-rgb').trim() || '0,212,255';
+            spotlight.style.background = `radial-gradient(600px circle at ${e.clientX}px ${e.clientY}px, rgba(${rgb}, 0.06), transparent 40%)`;
+        }
+    });
+
+    (function() {
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        const cx = () => window.innerWidth / 2, cy = () => window.innerHeight / 2;
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+        (function tick() {
+            const ox = (mouseX - cx()) / cx(), oy = (mouseY - cy()) / cy();
+            document.querySelectorAll('.deco-shape').forEach(shape => {
+                const speed = parseFloat(shape.dataset.speed) || 0.03;
+                shape.style.transform = `translate(${ox * speed * 100}px, ${oy * speed * 100}px)`;
+            });
+            requestAnimationFrame(tick);
+        })();
+    })();
+
+    window.initParticles = function(canvas, options) {
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        function resize() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+        resize();
+        const interactive = options.interactive !== false;
+        const count = options.count || (interactive ? 55 : 18);
+        let mx = -1000, my = -1000;
+        const rgb = getComputedStyle(document.documentElement).getPropertyValue('--glow-color-rgb').trim() || '0,212,255';
+        const [r, g, b] = rgb.split(',').map(Number);
+        const particles = Array.from({ length: count }, () => ({
+            x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+            size: Math.random() * 2.5 + 0.8, alpha: Math.random() * 0.35 + 0.1
+        }));
+        if (interactive) {
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                mx = e.clientX - rect.left; my = e.clientY - rect.top;
+            });
+            canvas.addEventListener('mouseleave', () => { mx = -1000; my = -1000; });
+        }
+        window.addEventListener('resize', resize);
+        (function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                if (interactive) {
+                    const dx = p.x - mx, dy = p.y - my, dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                    if (dist < 120) {
+                        const force = (120 - dist) / 120 * 2;
+                        p.vx += (dx / dist) * force * 0.1;
+                        p.vy += (dy / dist) * force * 0.1;
+                    }
+                }
+                p.vx *= 0.98; p.vy *= 0.98; p.x += p.vx; p.y += p.vy;
+                if (p.x < 0) p.x = canvas.width; if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height; if (p.y > canvas.height) p.y = 0;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${r},${g},${b},${p.alpha})`; ctx.fill();
+            });
+            requestAnimationFrame(animate);
+        })();
+    };
+
+    document.querySelectorAll('.particle-canvas').forEach(c => window.initParticles(c, { interactive: true, count: 55 }));
+    document.querySelectorAll('.particle-canvas-ambient').forEach(c => window.initParticles(c, { interactive: false, count: 18 }));
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) animateSlide(entry.target);
+        });
+    }, { threshold: 0.22, rootMargin: '0px 0px -8% 0px' });
+
+    document.querySelectorAll('.slide').forEach((slide, index) => {
+        observer.observe(slide);
+        if (index === 0) animateSlide(slide);
+    });
+</script>
+</div>
+</body>
+</html>
